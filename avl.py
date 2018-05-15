@@ -10,6 +10,7 @@ class AVL_NODE():
         self.parent = None  # Referência ao pai
 
         self.balancingFactor = 0  # Fator de Balanceamento
+        self.height = 1
 
     def __str__(self):
         # Define a forma como será representado o objeto na função print()
@@ -33,15 +34,11 @@ class AVL_NODE():
         pass
 
     # Funções de Cálculo
-
-    def recompute_heights(self, start_from_node):
-        changed = True
-        node = start_from_node
-        while node and changed:
-            old_height = node.height
-            node.height = (node.max_children_height() + 1 if (node.rightChild or node.leftChild) else 0)
-            changed = node.height != old_height
-            node = node.parent
+    def calculateHeight(self):
+        if self is None:
+            return 0
+        else:
+            return self.height
 
     def calculateBalancingFactor(self):
         pass
@@ -94,6 +91,7 @@ class AVL_NODE():
     # Funções de Adição e Remoção de Nós
 
     def insert(self, node):
+        # Inserção
         if self is None:
             self = node
         if node.key < self.key:
@@ -109,6 +107,10 @@ class AVL_NODE():
             else:
                 node.parent = self
                 self.right = node
+
+        # Atualização da altura dos  Nós]
+        self.height = 1 + max(self.calculateHeight(self.left), self.calculateHeight(self.right))
+        self.balance = self.calculateBalancingFactor()
         return self.parent
 
     def remove(self, key):

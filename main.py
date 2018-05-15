@@ -1,8 +1,6 @@
 import avl
 import tree
 
-node = avl.AVL_NODE(10,[])
-
 print(node)
 
 node.insert(avl.AVL_NODE(15,[]))
