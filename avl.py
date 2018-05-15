@@ -1,21 +1,26 @@
 # import random, math
 
-outputdebug = True
+debugEnable = True
 
-
-def debug(msg):
-    if outputdebug:
-        print(msg)
+def debug(string):
+    if debugEnable is True:
+        print(string)
 
 
 class Node():
-    def __init__(self, key):
+    # Construtor do Nó
+    def __init__(self, key, data):
+        self.data = data
         self.key = key
         self.left = None
         self.right = None
 
+    def __str__(self):
+        return "{ '" + str(self.key) + "' : " + str(self.data) + " }"
+
 
 class AVLTree():
+    # Construtor da Árvore
     def __init__(self, *args):
         self.node = None
         self.height = -1
@@ -128,22 +133,29 @@ class AVLTree():
         if self.node != None:
             if self.node.key == key:
                 debug("Removendo: " + str(key))
+                # Se o nó for uma folha, simpelsmente remover.
                 if self.node.left.node == None and self.node.right.node == None:
                     self.node = None
+                # Se o nó tiver não tiver um filho a esquerda, mas tiver o da direita, tornar o filho a direita a raíz
                 elif self.node.left.node == None:
                     self.node = self.node.right.node
+                # Se o nó tiver não tiver um filho a direita, mas tiver o da esquerda, tornar o filho a esquerda a raíz
                 elif self.node.right.node == None:
                     self.node = self.node.left.node
+
+                # Caso não seja nenhum dos casos acima, devolver o nó sucessor.
                 else:
                     replacement = self.logical_successor(self.node)
-                    if replacement != None:  # sanity check
+                    if replacement != None: # Verifica se o nó para substituir não é vazio
                         debug("Substituindo " + str(key) + " por " + str(replacement.key))
                         self.node.key = replacement.key
-
                         self.node.right.delete(replacement.key)
 
+                # Chama a função para rebalancear árvore
                 self.rebalance()
                 return
+
+            # Se não for o nó desejado, procurar nas suas sub-árvores
             elif key < self.node.key:
                 self.node.left.delete(key)
             elif key > self.node.key:
@@ -153,6 +165,7 @@ class AVLTree():
         else:
             return
 
+    # Retorna o predecessor lógico
     def logical_predecessor(self, node):
         node = node.left.node
         if node != None:
@@ -163,6 +176,7 @@ class AVLTree():
                     node = node.right.node
         return node
 
+    # Retorna o sucessor lógico
     def logical_successor(self, node):
         node = node.right.node
         if node != None:
@@ -175,13 +189,16 @@ class AVLTree():
                     node = node.left.node
         return node
 
+    # Verifica se a árvore está balanceada
     def check_balanced(self):
         if self == None or self.node == None:
             return True
         self.update_heights()
         self.update_balances()
+        ## ABS: retorna o valor absoluto. Verifica se a função está balanceada, retornando "false" caso não.
         return ((abs(self.balance) < 2) and self.node.left.check_balanced() and self.node.right.check_balanced())
 
+    # Preenche um vetor com as chaves em-ordem.
     def inorder_traverse(self):
         if self.node == None:
             return []
@@ -199,6 +216,7 @@ class AVLTree():
 
         return inlist
 
+    # DEBUG: Mostra a árvore via prompt de comando.
     def display(self, level=0, pref=''):
         self.update_heights()
         self.update_balances()
