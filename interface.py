@@ -9,9 +9,12 @@ class MainMenu(Frame):
     def __init__(self, master=None):
         Frame.__init__(self,master)
         self.master = master
-        self.init_window()
 
-    def init_window(self):
+        arvore = avl.AVLTree()
+
+        self.init_window(arvore)
+
+    def init_window(self, arvore):
         self.master.title(title)
         # Criação do Container Mestre
         self.top = Frame(self.master)
@@ -28,21 +31,13 @@ class MainMenu(Frame):
         self.treeviewcontainer = Frame(self.top)
         # tree = ttk.Treeview(self.treeviewcontainer)
         tree = tkinter.ttk.Treeview(self.treeviewcontainer)
-        tree["columns"] = ("key", "data")
+        tree["columns"] = ("key", "data", "fb")
         tree.column("key", width=100)
-        tree.column("data", width=300)
+        tree.column("data", width=200)
+        tree.column("fb", width=100)
         tree.heading("key", text="Chave")
         tree.heading("data", text="Lista de Dados")
-
-        self.insertNodeIntoListView(tree, avl.Node(15, ["penes", "viadinho"]))
-
-        id2 = tree.insert("", 1, "dir2", text="Dir 2")
-        tree.insert(id2, "end", "dir 2", text="sub dir 2", values=("2A", "2B"))
-
-        ##alternatively:
-        tree.insert("", 3, "dir3", text="Dir 3")
-        tree.insert("dir3", 3, text=" sub dir 3", values=("3A", " 3B"))
-
+        tree.heading("fb", text="F. Balanceamento")
         tree.pack()
         self.treeviewcontainer.pack()
 
@@ -59,29 +54,37 @@ class MainMenu(Frame):
         self.buttonsContainer = Frame(self.master)
 
         # Botão Inserir
-        self.insertButton = Button(self.buttonsContainer, text="Inserir nó")
-        self.insertButton["width"] = 20
+        self.insertButton = Button(self.buttonsContainer, text="Inserir nó", command=self.insertButton_function(tree))
+        self.insertButton["width"] = 30
         self.insertButton.pack(side=LEFT)
         # Botão Remover
         self.removeButton = Button(self.buttonsContainer, text="Remover nó")
-        self.removeButton["width"] = 20
+        self.removeButton["width"] = 30
+        self.removeButton.pack(side=LEFT)
+        # Botão Atualizar
+        self.removeButton = Button(self.buttonsContainer, text="Atualizar Árvore")
+        self.removeButton["width"] = 30
         self.removeButton.pack(side=LEFT)
         # Botão Mostrar
-        self.showButton = Button(self.buttonsContainer, text="Mostrar nó")
-        self.showButton["width"] = 20
-        self.showButton.pack(side=LEFT)
+        # self.showButton = Button(self.buttonsContainer, text="Mostrar nó")
+        # self.showButton["width"] = 20
+        # self.showButton.pack(side=LEFT)
 
         # Criação da Debug Bar
-
+        self.debugContainer = Frame(self.master)
+        self.debugLabel = Label(self.buttonsContainer, text='DEBUG')
+        self.debugLabel.pack(side=BOTTOM)
 
         #Packing
         self.buttonsContainer.pack(side=BOTTOM)
         self.nodeControlContainer.pack(side=BOTTOM)
+        self.debugContainer.pack(side=BOTTOM)
 
 
     ### Funções para cada botão
 
-    def insertButton_function(self):
+    def insertButton_function(self, tree):
+        self.insertNodeIntoListView(tree, avl.Node(15, ["Lista", "de", "Dados"]))
         pass
     def removeButton_function(self):
         pass
@@ -92,8 +95,13 @@ class MainMenu(Frame):
 
     def insertNodeIntoListView(self, tree, node):
         if node is not None:
-            tree.insert("", 0, text="Nó "+ str(node.key), values=(str(node.key), str(node.data)))
+            tree.insert("", 0, text="Nó "+ str(node.key), values=(str(node.key), str(node.data), str(node.balance)))
             pass
     def find_traverseViaDirectory(self, tree, key):
-        tree.column
+
         pass
+
+    def selectItem(self, event):
+        curItem = self.tree.item(self.tree.focus())
+        col = self.tree.identify_column(event.x)
+        cell_value = curItem['key']

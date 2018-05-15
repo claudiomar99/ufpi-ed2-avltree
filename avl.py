@@ -14,9 +14,14 @@ class Node():
         self.key = key
         self.left = None
         self.right = None
+        self.balance = 0
 
     def __str__(self):
         return "{ '" + str(self.key) + "' : " + str(self.data) + " }"
+
+    def getBalance(self):
+        if self.left and self.right:
+            return AVLTree.update_heights(self, True)
 
 
 class AVLTree():
@@ -41,49 +46,56 @@ class AVLTree():
 
     def insert(self, key):
         tree = self.node
+        newnode = Node(key, [])
 
-        newnode = Node(key)
-
+        # Se a árvore for vazia, realizar a primeira inserção
         if tree == None:
             self.node = newnode
             self.node.left = AVLTree()
             self.node.right = AVLTree()
             debug("Nó (" + str(key) + ") inserido")
 
+        # Se a chave for menor, procurar nas subárvores a esquerda
         elif key < tree.key:
             self.node.left.insert(key)
 
+        # Se a chave for maior, procurar nas subárvores a direita
         elif key > tree.key:
             self.node.right.insert(key)
 
+        # Se a chave já existir na árvore
         else:
             debug("Nó (" + str(key) + ") já existe na árvore.")
 
+        # Realiza o balanceamento da árvore, se necessário
         self.rebalance()
 
     def rebalance(self):
+        # Realiza o balanceamento da árvore inteira
         self.update_heights(False)
         self.update_balances(False)
 
+        # Verifica se o fator de balanceamento é maior que 1 ou menor que -1
         while self.balance < -1 or self.balance > 1:
             if self.balance > 1:
                 if self.node.left.balance < 0:
-                    self.node.left.lrotate()  # we're in case II
+                    self.node.left.lrotate()        # Rotação para a esquerda no filho a esquerda (casos de joelho)
                     self.update_heights()
                     self.update_balances()
-                self.rrotate()
+                self.rrotate()                      # Rotação para a direita no nó, para valor positivo de FB
                 self.update_heights()
                 self.update_balances()
 
             if self.balance < -1:
                 if self.node.right.balance > 0:
-                    self.node.right.rrotate()  # we're in case III
+                    self.node.right.rrotate()       # Rotação para a direita no filho a direita (casos de joelho)
                     self.update_heights()
                     self.update_balances()
-                self.lrotate()
+                self.lrotate()                      # Rotação para a esquerda no nó, para valor negativo de FB
                 self.update_heights()
                 self.update_balances()
 
+    # Rotação a direita
     def rrotate(self):
         debug('Rotacionando ' + str(self.node.key) + ' para a direita')
         A = self.node
@@ -94,6 +106,7 @@ class AVLTree():
         B.right.node = A
         A.left.node = T
 
+    # Rotação a esquerda
     def lrotate(self):
         debug('Rotacionando ' + str(self.node.key) + ' para a esquerda')
         A = self.node
@@ -104,6 +117,7 @@ class AVLTree():
         B.left.node = A
         A.right.node = T
 
+    # Função recursiva para atualizar a altura de cada nó
     def update_heights(self, recurse=True):
         if not self.node == None:
             if recurse:
@@ -114,9 +128,11 @@ class AVLTree():
 
             self.height = max(self.node.left.height,
                               self.node.right.height) + 1
+        # Se não houver nó
         else:
             self.height = -1
 
+    # Função recursiva para atualizar o balanceamento de cada nó
     def update_balances(self, recurse=True):
         if not self.node == None:
             if recurse:
@@ -126,8 +142,10 @@ class AVLTree():
                     self.node.right.update_balances()
 
             self.balance = self.node.left.height - self.node.right.height
+            return self.balance
         else:
             self.balance = 0
+            return self.balance
 
     def delete(self, key):
         if self.node != None:
@@ -221,7 +239,7 @@ class AVLTree():
         self.update_heights()
         self.update_balances()
         if (self.node != None):
-            print ('.' * level * 3, pref, self.node.key, "(Altura: " + str(self.height) + "| FB: " + str(
+            print ('.' * level * 3, pref, self.node.key, "(Altura: " + str(self.height) + " | FB: " + str(
                 self.balance) + ")", '[FOLHA]' if self.is_leaf() else ' ')
             if self.node.left != None:
                 self.node.left.display(level + 1, 'LN')
@@ -229,25 +247,10 @@ class AVLTree():
                 self.node.right.display(level + 1, 'RN')
 
 
-# Usage example
 if __name__ == "__main__":
     a = AVLTree()
-    print("----- Inserting -------")
-    # inlist = [5, 2, 12, -4, 3, 21, 19, 25]
-    inlist = [7, 5, 2, 6, 3, 4, 1, 8, 9, 0]
+    inlist = [15,17,20,15,34,18,29,15,10,5,7,1,3,4,25,54]
     for i in inlist:
         a.insert(i)
 
     a.display()
-
-    print("----- Deleting -------")
-    a.delete(3)
-    a.delete(4)
-    # a.delete(5)
-    a.display()
-
-    print()
-    print("Input            :", inlist)
-    print("deleting ...       ", 3)
-    print("deleting ...       ", 4)
-    print("Inorder traversal:", a.inorder_traverse())
