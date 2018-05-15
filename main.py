@@ -1,15 +1,10 @@
+import tkinter
+import interface
 import avl
-import tree
+import fileParser
 
-node = avl.AVL_NODE(10,[])
+main = tkinter.Tk()
+interface.MainMenu(main)
+main.option_add('*tearOff', False)
+main.mainloop()
 
-print(node)
-
-node.insert(avl.AVL_NODE(15,[]))
-node.insert(avl.AVL_NODE(5,[]))
-node.insert(avl.AVL_NODE(1,[]))
-node.insert(avl.AVL_NODE(17,[]))
-node.insert(avl.AVL_NODE(20,[]))
-node.insert(avl.AVL_NODE(12,[]))
-
-node.printInOrder()
