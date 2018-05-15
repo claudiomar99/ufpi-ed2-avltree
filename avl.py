@@ -41,7 +41,13 @@ class AVL_NODE():
             return self.height
 
     def calculateBalancingFactor(self):
-        pass
+        if self.left and self.right:
+            balance = self.right.calculateHeight() - self.left.calculateHeight()
+        elif self.left:
+            balance = - self.left.calculateHeight()
+        elif self.right:
+            balance = self.right.calculateHeight()
+        return balance
 
     # Funções de Impressão
 
@@ -56,7 +62,7 @@ class AVL_NODE():
     def printInOrder(self):
         if self.left:
             self.left.printInOrder()
-        print(self)
+        print(" "  * self.height + str(self))
         if self.right:
             self.right.printInOrder()
 
@@ -108,8 +114,13 @@ class AVL_NODE():
                 node.parent = self
                 self.right = node
 
-        # Atualização da altura dos  Nós]
-        self.height = 1 + max(self.calculateHeight(self.left), self.calculateHeight(self.right))
+        # Atualização da altura dos Nós
+        if self.left and self.right:
+            self.height = 1 + max(self.left.calculateHeight(), self.right.calculateHeight())
+        elif self.left:
+                self.height = 1 + self.left.calculateHeight()
+        elif self.right:
+            self.height = 1 + self.right.calculateHeight()
         self.balance = self.calculateBalancingFactor()
         return self.parent
 
